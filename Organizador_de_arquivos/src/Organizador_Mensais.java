@@ -96,36 +96,40 @@ public class Organizador_Mensais {
 		    
 
 			//======================================Classificar=======================================================//		    
-		    if (parsedText.contains("DeSTDA")){
+		    if (parsedText.contains("DeSTDA")){ 		//DESTDA
 		        TipoFile = ("DESTDA");
 		        parsedText = process(parsedText);
 		    }
-	        else if (parsedText.contains("PGDAS-D")){
+	        else if (parsedText.contains("PGDAS-D")){	//SIMPLES MENSAL
 	        	TipoFile = ("DSN");
 	        	parsedText = process(parsedText);
 		    } 
-	        else if (parsedText.contains("DEISS")){
+	        else if (parsedText.contains("DEISS")){  	//DEISS AP
 	        	TipoFile = ("DEISS");
 	        	parsedText = process(parsedText);
 		    }
-	        else if (parsedText.contains("DEFIS")){
+	        else if (parsedText.contains("DEFIS")){		
 	        	TipoFile = ("DEFIS");
 	        	parsedText = process(parsedText);
 		    }
-	        else if (parsedText.contains("Valor total do ICMS a recolher")){
+	        else if (parsedText.contains("Valor total do ICMS a recolher")){	//SPED
 	        	TipoFile = ("EFD ICMS IPI");
 	        	parsedText = process(parsedText);
 	        }
-		    else if (parsedText.contains("Recibo de declaracao de ISS")){
+		    else if (parsedText.contains("Recibo de declaracao de ISS")){		//ISS IPE
 	        	TipoFile = ("RDI");
 	        	parsedText = process(parsedText);
 	        }
-	        else if (parsedText.contains("NFG")){
+	        else if (parsedText.contains("NFG")){		//NFG
 	        	TipoFile = ("NFG");
 	        	parsedText = process(parsedText);
 	        }
-	        else if (parsedText.contains("DMS")){
+	        else if (parsedText.contains("DMS")){		//DMS
 	        	TipoFile = ("DMS"); 
+	        	parsedText = process(parsedText); 
+		    }
+	        else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas")){
+	        	TipoFile = ("OPÇÃO SIMPLES"); 
 	        	parsedText = process(parsedText); 
 		    }
 		    else{
@@ -418,6 +422,14 @@ public class Organizador_Mensais {
 				 anoDocumento = String.valueOf(ano);
 				 Datadodocumento = ("0" + mes0B[mesI] + "." + ano);
 				break;
+			}}}}
+			else if	(TipoFile == "OPÇÃO SIMPLES") {
+				  for (;ano<2100; ano++) {
+				   for (mesI=0;mesI<12;mesI++) {
+					if (parsedText_Process.contains("Ano-calendario: " + ano)){
+					 anoDocumento = String.valueOf(ano);
+					 Datadodocumento = "" + ano;
+					break;
 			}}}}
 			return parsedText_Process;		
 		}	
