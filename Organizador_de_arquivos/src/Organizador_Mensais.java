@@ -442,7 +442,6 @@ public class Organizador_Mensais {
 			}
 		} else if (TipoFile == "OPÇÃO SIMPLES") {
 			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
 					if (parsedText_Process.contains("Ano-calendario: " + ano)) {
 						anoDocumento = String.valueOf(ano);
 						Datadodocumento = "" + ano;
@@ -450,7 +449,6 @@ public class Organizador_Mensais {
 					}
 				}
 			}
-		}
 		return parsedText_Process;
 	}
 }
