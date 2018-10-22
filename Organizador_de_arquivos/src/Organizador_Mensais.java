@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.text.Normalizer;
+import java.time.Month;
+import java.time.Year;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Formatter;
@@ -19,48 +22,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.text.SimpleDateFormat;
+import com.ibm.icu.util.Calendar;
 
 public class Organizador_Mensais {
-	//REMOVER TODAS ESSAS GLOBAIS PELAMORDEDEUS QQ É ISSO???HASUDHAS
-	static String FileString; // Variavel para converte a edita de File para String, o nome da empresa para o // pesquisa no objeto empresa.
-	static String EmpresaCaminho; // caminho a ser arquivado, depois de pathsrv.
-	static String FullPath; // caminho completo para ser arquivado.
-	static String anoDocumento;
-	static String Datadodocumento;
-	static String Empresaname;
-	static String TipoFile;
-	// ======================================CAMINHOS-SERVIDOR=========================================================//
-	static String pathtoread = "\\\\10.1.1.135\\ORGANIZADOR_DE_ARQUIVOS\\"; // Caminho a ser lido.
-	static String pathtosrv = "\\\\10.1.20.13\\setores\\GERAL\\Documentos empresariais\\Documentos\\";
-	static String Global;
-	static File[] fList;
-	static File[] listOfFiles;
-	static int iteracaoComSucesso = 0;
-	static int iteracaoComErros = 0;
-	static int iteracaoTotal = 0;
-	static Date date = new Date();
-	static DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
-	public static void main(String args[]) throws IOException {
-		BufferedWriter bw = null;
-		FileWriter fw = null;
-		PDFParser parser = null;
-		PDDocument pdDoc = null;
-		COSDocument cosDoc = null;
-
-		String fwPath = (pathtoread + "log\\" + "log " + dateFormat.format(date) + ".txt");
-		fw = new FileWriter(fwPath);
-		bw = new BufferedWriter(fw);
-		File log = new File(fwPath);
-		PDFTextStripper pdfStripper;
-
-		// ==========================Cria Array de pdfs da pasta de
-		// leitura============================================//
-		File folder = new File(pathtoread);
-		File[] listOfFiles = folder.listFiles();
-
-		// ====================================Inicio do
-		// log===========================================================//
+	public static void EscreveTopoLog(BufferedWriter bw, Date date, DateFormat dateFormat) throws IOException {
 		bw.write("Data: " + dateFormat.format(date));
 		bw.newLine(); // Linha dois - empresas processadas
 		bw.write("Arquivos processadas: L+2");
@@ -72,19 +38,174 @@ public class Organizador_Mensais {
 		bw.write("Tempo poupado: L+5 minutos");
 		bw.newLine();
 		bw.newLine();
+	}
 
-		// ======================Processa documento por documento na poosta do
-		// Organizar==============================//
+	public static String[] IdenData(String TipoFile) {
+		String ifFormatter = null, DataF = null;
+
+		if (TipoFile == "DESTDA") {
+			ifFormatter = "Mes Referencia " + "%s/%d";
+			DataF = "%s.%d";
+		} else if (TipoFile == "DSN") {
+			ifFormatter = "Principal" + "\r\n" + "%s/%d";
+			DataF = "%s.%d";
+		} else if (TipoFile == "DEISS") {
+			ifFormatter = "Ano e Mes de Referencia:    " + "%d/  %s";
+			DataF = "%s.%d";
+		} else if (TipoFile == "DEFIS") {
+			ifFormatter = "Periodo abrangido pela Declaracao: 01/" + "%s/%d" + " a 31/12/%d";
+			DataF = "%d";
+		} else if (TipoFile == "RDI") {
+			ifFormatter = "Periodo: " + "%s/%d";
+			DataF = "%s.%d";
+		} else if (TipoFile == "NFG") {
+			ifFormatter = "periodo de 01/%s/%d a %d/%s/%d";
+			DataF = "%s.%d";
+		} else if (TipoFile == "OPÇÃO SIMPLES") {
+			ifFormatter = "Ano-calendario: %d";
+			DataF = "%d";
+		} else if (TipoFile == "SPED CONTRIBUICOES") {
+			ifFormatter = "01/%s/%d a %d/%s/%d";
+			DataF = "%s.%d";
+		}
+
+		/*
+		 * } else if (TipoFile == "DMS") { Formater = "Valor do Faturamento:" + "\r\n" +
+		 * mes0A[mesI] + "%s/%d";
+		 */
+
+		// mover todos os formatdores do detecta data pra ca
+
+		return new String[] { ifFormatter, DataF };
+	}
+
+	public static void ErroArquivo(BufferedWriter bw, String parsedText) throws IOException {
+		bw.newLine();
+		bw.write("Erro no doc:");
+		bw.newLine();
+		bw.newLine();
+		bw.write(parsedText);
+		bw.newLine();
+		bw.write("Fim do Erro no doc.");
+		bw.newLine();
+		bw.write("-------------------------------------------------------------------------------");
+	}
+
+	public static String tipodearquivo(String parsedText, String TipoFile) {
+		if (parsedText.contains("DeSTDA")) {
+			TipoFile = ("DESTDA");
+		} else if (parsedText.contains("PGDAS-D")) {
+			TipoFile = ("DSN");
+		} else if (parsedText.contains("DEISS")) {
+			TipoFile = ("DEISS");
+		} else if (parsedText.contains("DEFIS")) {
+			TipoFile = ("DEFIS");
+		} else if (parsedText.contains("Valor total do ICMS a recolher")) {
+			TipoFile = ("EFD ICMS IPI");
+		} else if (parsedText.contains("Recibo de declaracao de ISS")) {
+			TipoFile = ("RDI");
+		} else if (parsedText.contains("NFG")) {
+			TipoFile = ("NFG");
+		} else if (parsedText.contains("DMS")) {
+			TipoFile = ("DMS");
+		} else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas")) {
+			TipoFile = ("OPÇÃO SIMPLES");
+		} else if (parsedText.contains("RECIBO DE ENTREGA DE ESCRITURACAO FISCAL DIGITAL - CONTRIBUICOES")) {
+			TipoFile = ("SPED CONTRIBUICOES");
+		} else {
+		}
+		return TipoFile;
+	}
+
+	public static void estatisticas(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)
+			throws IOException {
+		File log = new File(logPath);
+		String Sucesso, Erros, Total, iteracaoMin, line, input = "";
+		// ================Escrever estatisticas no log========================//
+
+		BufferedReader readLog = new BufferedReader(new FileReader(logPath));
+
+		while ((line = readLog.readLine()) != null) {
+			input += line + System.lineSeparator();
+		}
+
+		int min = (iteracaoTotal * 20) / 60;
+		int seg = (iteracaoTotal * 20) - (min * 60);
+		iteracaoMin = (min + ":" + seg);
+
+		iteracaoComErros = iteracaoTotal - iteracaoComSucesso;
+
+		Sucesso = Integer.toString(iteracaoComSucesso);
+		Erros = Integer.toString(iteracaoComErros);
+		Total = Integer.toString(iteracaoTotal);
+
+		if (iteracaoTotal == 0) {
+			readLog.close();
+			FileOutputStream out = new FileOutputStream(logPath);
+			out.write(input.getBytes());
+			out.close();
+			log.delete();
+			System.exit(0);
+		} else if (min == 0 && seg > 0) {
+			input = input.replace("L+2", Total);// Total
+			input = input.replace("L+3", Sucesso);// Sucesso
+			input = input.replace("L+4", Erros);// Erros
+			input = input.replace("L+5 minutos", iteracaoMin + " segundos");// Seg
+		} else {
+			input = input.replace("L+2", Total);// Total
+			input = input.replace("L+3", Sucesso);// Sucesso
+			input = input.replace("L+4", Erros);// Erros
+			input = input.replace("L+5", iteracaoMin);// Minutos
+		}
+
+		
+		FileOutputStream out = new FileOutputStream(logPath);
+		out.write(input.getBytes());
+		out.close();
+		readLog.close();
+		System.out.println(input);
+	}
+
+	public static void main(String args[]) throws IOException {
+
+		String FullPath;
+		Date date = new Date();
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+		String pathtoread = "\\\\10.1.1.135\\ORGANIZADOR_DE_ARQUIVOS\\"; // Caminho a ser lido.
+		String pathtosrv = "\\\\10.1.20.13\\setores\\GERAL\\Documentos empresariais\\Documentos\\";
+		String logPath = (pathtoread + "log\\" + "log " + dateFormat.format(date) + ".txt");
+		String EmpresaCaminho = null;
+		String Datadodocumento = null;
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		PDFParser parser = null;
+		PDDocument pdDoc = null;
+		COSDocument cosDoc = null;
+		String TipoFile = null;
+		String parsedText;
+		fw = new FileWriter(logPath);
+		bw = new BufferedWriter(fw);
+		String EmpresaNome = null;
+		int iteracaoComSucesso = 0, iteracaoComErros = 0, iteracaoTotal = 0;
+		String anoDocumento = null;
+		PDFTextStripper pdfStripper;
+
+		// Cria Array de pdfs da pasta de leitura //
+		File folder = new File(pathtoread);
+		File[] listOfFiles = folder.listFiles();
+
+		EscreveTopoLog(bw, date, dateFormat);
+
+		// Processa documento por documento na pasta do Organizar //
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile() && listOfFiles[i].getName().matches("(?i).*\\.(pdf|PDF)$")) {
 
-				// =================Converte pdf para txt para analise========================//
-				String parsedText;
+				// Converte pdf para txt para analise //
+
 				String fileName = listOfFiles[i].getAbsolutePath();
 				File file = new File(fileName);
 				try {
 					parser = new PDFParser(new FileInputStream(file));
-					System.out.println("file:" + file);
 					parser.parse();
 					cosDoc = parser.getDocument();
 					pdfStripper = new PDFTextStripper();
@@ -95,71 +216,48 @@ public class Organizador_Mensais {
 					parsedText = parsedText.replaceAll("&", "E");
 
 					// ======================================Classificar=======================================================//
-					if (parsedText.contains("DeSTDA")) { // DESTDA
-						TipoFile = ("DESTDA");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("PGDAS-D")) { // SIMPLES MENSAL
-						TipoFile = ("DSN");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("DEISS")) { // DEISS AP
-						TipoFile = ("DEISS");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("DEFIS")) {
-						TipoFile = ("DEFIS");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("Valor total do ICMS a recolher")) { // SPED
-						TipoFile = ("EFD ICMS IPI");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("Recibo de declaracao de ISS")) { // ISS IPE
-						TipoFile = ("RDI");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("NFG")) { // NFG
-						TipoFile = ("NFG");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("DMS")) { // DMS
-						TipoFile = ("DMS");
-						parsedText = process(parsedText);
-					} else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas")) {
-						TipoFile = ("OPÇÃO SIMPLES");
-						parsedText = process(parsedText);
-					} else {
+					TipoFile = tipodearquivo(parsedText, TipoFile);
+
+					if (TipoFile == null) {
 						bw.write("Tipo não encontrado:");
 						bw.newLine();
 						bw.write(parsedText);
 						bw.write("-------------------end--of--bug-----------------------");
 					}
 
-					// ========================Descobrir nome da
-					// empresa=======================================================//
-					EmpresaGetName(parsedText);
+					// ================Roda Exceçoes============//
+					parsedText = process(parsedText, TipoFile);
+					// pega mea e ano do documento
+					String[] ret = date(parsedText, TipoFile, anoDocumento);
+
+					anoDocumento = ret[0];
+					Datadodocumento = ret[1];
+
+					// =======Descobrir nome da empresa=========//
+					EmpresaNome = EmpresaGetName(parsedText, pathtosrv, EmpresaNome);
+
+					EmpresaCaminho = filial(parsedText, pathtosrv, EmpresaCaminho);
+
+					FullPath = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\" + TipoFile
+							+ " " + Datadodocumento + ".pdf");
 
 					// ===================================log==================================================================//
 					// =================Nome empresa e origem doc========================//
 					bw.newLine();
-					bw.write("Empresa: " + Empresaname);
+					bw.write("Empresa: " + EmpresaNome);
 					bw.newLine();
 					bw.write("Origem:  " + listOfFiles[i].getAbsolutePath());
 					bw.newLine();
-
-					// =========================Destino doc==============================//
-					FullPath = (EmpresaCaminho + "\\" + TipoFile + "\\" + anoDocumento + "\\" + TipoFile + " "
-							+ Datadodocumento + ".pdf");
 					bw.write("Destino: " + FullPath);
 					bw.newLine();
 
 					// =================================Vericiar se existe e criar
 					// diretório===================================//
-					File PathWOFileF = new File(EmpresaCaminho + "\\" + TipoFile + "\\" + anoDocumento + "\\");
+					File PathWOFileF = new File(
+							pathtosrv + EmpresaCaminho + "\\" + TipoFile + "\\" + anoDocumento + "\\");
+
 					if (FullPath.contains("null")) {
-						bw.newLine();
-						bw.write("Erro no doc:");
-						bw.newLine();
-						bw.newLine();
-						bw.write(parsedText);
-						bw.newLine();
-						bw.write("Fim do Erro no doc.");
-						bw.newLine();
-						bw.write("-------------------------------------------------------------------------------");
+						ErroArquivo(bw, parsedText);
 					} else if (!PathWOFileF.exists()) {
 						boolean result = false;
 						try {
@@ -184,14 +282,14 @@ public class Organizador_Mensais {
 						String ifExists = filegravar.replaceAll(".pdf", "(" + fileNo + ").pdf");
 						destination = new File(ifExists);
 					}
+				//	System.out.println(listOfFiles[i] + ".REC");
 
 					File source = new File(listOfFiles[i].getAbsolutePath());
 
-					if (!FullPath.contains("null")) {
-						copyFile(source, destination);
-						iteracaoComSucesso++;
-						source.delete();
-					}
+					/*
+					 * if (!FullPath.contains("null")) { copyFile(source, destination);
+					 * iteracaoComSucesso++; source.delete(); }
+					 */
 
 					bw.write(
 							"------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -207,14 +305,14 @@ public class Organizador_Mensais {
 						pdDoc.close();
 					if (cosDoc != null)
 						cosDoc.close();
-					EmpresaCaminho = null;
-					Empresaname = null;
-					Datadodocumento = null;
+					EmpresaNome = null;
 					anoDocumento = null;
 					TipoFile = null;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			} else if (listOfFiles[i].isFile() && listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT)$")) {
+
 			}
 		} // close for
 
@@ -223,80 +321,38 @@ public class Organizador_Mensais {
 		bw.close();
 		fw.close();
 
-		// ================Escrever estatisticas no log========================//
-		BufferedReader readLog = new BufferedReader(new FileReader(fwPath));
-		String line;
-		String input = "";
-		while ((line = readLog.readLine()) != null) {
-			input += line + System.lineSeparator();
-		}
-		String iteracaoMin;
-		int min = (iteracaoTotal * 20) / 60;
-		int seg = (iteracaoTotal * 20) - (min * 60);
-		iteracaoMin = (min + ":" + seg);
+		estatisticas(iteracaoComSucesso, iteracaoComErros, iteracaoTotal, logPath);
 
-		iteracaoComErros = iteracaoTotal - iteracaoComSucesso;
-
-		String Sucesso = Integer.toString(iteracaoComSucesso);
-		String Erros = Integer.toString(iteracaoComErros);
-		String Total = Integer.toString(iteracaoTotal);
-		if (iteracaoTotal == 0) {
-			try {
-				readLog.close();
-				FileOutputStream out = new FileOutputStream(fwPath);
-				out.write(input.getBytes());
-				out.close();
-				log.delete();
-			} catch (Exception e3) {
-				e3.printStackTrace();
-			}
-			System.exit(0);
-		} else if (min == 0 && seg > 0) {
-			input = input.replace("L+2", Total);// Total
-			input = input.replace("L+3", Sucesso);// Sucesso
-			input = input.replace("L+4", Erros);// Erros
-			input = input.replace("L+5 minutos", iteracaoMin + " segundos");// Seg
-		} else {
-			input = input.replace("L+2", Total);// Total
-			input = input.replace("L+3", Sucesso);// Sucesso
-			input = input.replace("L+4", Erros);// Erros
-			input = input.replace("L+5", iteracaoMin);// Minutos
-		}
-		FileOutputStream out = new FileOutputStream(fwPath);
-		out.write(input.getBytes());
-		out.close();
-		readLog.close();
-		System.out.println("\nDone");
 	}// close main
 
-	// ===============================Função para descobrir nome da
-	// empresa========================================//
-	private static void EmpresaGetName(String ArquivoProcessado) throws IOException {
+	// Função para descobrir nome da empresa //
+	private static String EmpresaGetName(String ArquivoProcessado, String pathtosrv, String EmpresaNome)
+			throws IOException {
 		int i = 0;
-		int found = 0;
 
 		File folder = new File(pathtosrv);
 		File[] listaEmpresasSRV = folder.listFiles();
 
 		for (i = 0; i < listaEmpresasSRV.length; i++) {
 			if (ArquivoProcessado.contains(listaEmpresasSRV[i].getName())) {
-				EmpresaCaminho = listaEmpresasSRV[i].getPath();
-				Empresaname = listaEmpresasSRV[i].getName();
-
-				// EXCECOES
-				if (ArquivoProcessado.contains("LUIZ ALBERTO PELLIN")) {
-					EmpresaCaminho = EmpresaCaminho + "\\1 MATRIZ";
-				}
-				if (ArquivoProcessado.contains("12.883.198/0001-88")) {
-					EmpresaCaminho = EmpresaCaminho + "\\CONFIDENZA NOVO";
-				}
-				if (ArquivoProcessado.contains("05.242.070/0001-70")) {
-					EmpresaCaminho = EmpresaCaminho + "\\CONFIDENZA VELHO";
-				} else
-					found = 1;
-			} else if (i >= listaEmpresasSRV.length && found == 0) {
+				EmpresaNome = listaEmpresasSRV[i].getName();
 			}
 		}
+		return EmpresaNome;
+	}
+
+	private static String filial(String ArquivoProcessado, String pathtosrv, String EmpresaCaminho) throws IOException {
+		if (ArquivoProcessado.contains("LUIZ ALBERTO PELLIN")) {
+			EmpresaCaminho = EmpresaCaminho + "\\1 MATRIZ";
+		}
+		if (ArquivoProcessado.contains("12.883.198/0001-88")) {
+			EmpresaCaminho = EmpresaCaminho + "\\CONFIDENZA NOVO";
+		}
+		if (ArquivoProcessado.contains("05.242.070/0001-70")) {
+			EmpresaCaminho = EmpresaCaminho + "\\CONFIDENZA VELHO";
+		} else {
+		}
+		return EmpresaCaminho;
 	}
 
 	// ========================Move arquivo para a pasta da empresa
@@ -327,139 +383,142 @@ public class Organizador_Mensais {
 
 	// ==========resolve as exesões gramaticas cadastradas e encontra o periodo no
 	// documento=======================//
-	public static String process(String parsedText_Process) {
-		int mesI = 01;
-		int ano = 2000;
-		String[] mes0A = new String[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
-		String[] mes0B = new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-		String[] mes0C = new String[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov",
-				"Dez" };
-
+	public static String process(String parsedText, String TipoFile) {
 		try {
 			Properties prop = new Properties();
 			final FileInputStream exeptions = new FileInputStream(
 					"\\\\10.1.1.135\\excecoesOrganizador\\" + TipoFile + ".properties");
 			prop.load(exeptions);
-
 			for (int c = 1; c <= (prop.size() / 2); c++) {
-				parsedText_Process = parsedText_Process.replaceAll("" + prop.getProperty(c + "A") + "",
+				parsedText = parsedText.replaceAll("" + prop.getProperty(c + "A") + "",
 						"" + prop.getProperty(c + "B") + "");
 			}
 			exeptions.close();
 		} catch (IOException ex) {
 		}
-		ano = 1950;
-		if (TipoFile == "DESTDA") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					if (parsedText_Process.contains("Mes Referencia " + mes0A[mesI] + "/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = (mes0A[mesI] + "." + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "DSN") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					if (parsedText_Process.contains("Principal" + "\r\n" + mes0A[mesI] + "/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = (mes0A[mesI] + "." + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "NFG") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					for (int dia = 28; dia < 32; dia++) {
-						if (parsedText_Process.contains("periodo de 01/" + mes0A[mesI] + "/" + ano + " a " + dia + "/"
-								+ mes0A[mesI] + "/" + ano)) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = (mes0A[mesI] + "." + ano);
-							break;
-						}
-					}
-				}
-			}
-		} else if (TipoFile == "DMS") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					if (parsedText_Process.contains("Valor do Faturamento:" + "\r\n" + mes0A[mesI] + "/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = (mes0A[mesI] + "." + ano);
-						break;
-					} else if (parsedText_Process.contains("Contribuinte:" + "\r\n" + mes0A[mesI] + "/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = (mes0A[mesI] + "." + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "EFD ICMS IPI") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) { // 01/04/2017 a 30/04/2017
-					for (int dia = 28; dia < 32; dia++) {
-						if (parsedText_Process.contains(
-								"01/" + mes0A[mesI] + "/" + ano + " a " + dia + "/" + mes0A[mesI] + "/" + ano)) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = (mes0A[mesI] + "." + ano);
-							break;
-						}
-					}
-				}
-			}
-		} else if (TipoFile == "DEFIS") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					if (parsedText_Process.contains(
-							"Periodo abrangido pela Declaracao: 01/" + mes0A[mesI] + "/" + ano + " a 31/12/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = ("" + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "RDI") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) { // Periodo: Jul/2018
-					if (parsedText_Process.contains("Periodo: " + mes0C[mesI] + "/" + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = (mes0A[mesI] + "." + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "DEISS") {
-			for (; ano < 2100; ano++) {
-				for (mesI = 0; mesI < 12; mesI++) {
-					if (parsedText_Process.contains("Ano e Mes de Referencia:    " + ano + "/  " + mes0B[mesI])) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = ("0" + mes0B[mesI] + "." + ano);
-						break;
-					}
-				}
-			}
-		} else if (TipoFile == "OPÇÃO SIMPLES") {
-			for (; ano < 2100; ano++) {
-					if (parsedText_Process.contains("Ano-calendario: " + ano)) {
-						anoDocumento = String.valueOf(ano);
-						Datadodocumento = "" + ano;
-						break;
-					}
-				}
-			}
-		return parsedText_Process;
+		return parsedText;
 	}
-}
 
-class MyFormatter extends Formatter {
-	@Override
-	public String format(LogRecord record) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(record.getLevel() + ": ");
-		builder.append(formatMessage(record));
-		builder.append(System.lineSeparator());
-		return builder.toString();
+	public static String[] date(String parsedText, String TipoFile, String anoDocumento) {
+
+		int mesI, ano, dia, tentativa = 0;
+
+		Calendar calendar = Calendar.getInstance();
+		int anoAtual = Year.now().getValue();
+		int mesAtual = calendar.get(Calendar.MONTH);
+
+		Date today = new Date();
+		calendar.setTime(today);
+		calendar.set(Calendar.MONTH, mesAtual);
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		calendar.add(Calendar.DATE, -1);
+
+		Date lastDayOfMonth = calendar.getTime();
+		DateFormat sdf = new SimpleDateFormat("dd");
+
+		String Datadodocumento = null;
+
+		String[] mes0A = new String[] { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
+		String[] mes0B = new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+		String[] mes0C = new String[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov","Dez" };
+
+		String[] retF = IdenData(TipoFile);
+		String ifformatter = retF[0];
+		String dateFormatter = retF[1];
+		
+		search: for (ano = 1950; ano < 2100; ano++) {
+			for (mesI = 0; mesI < 12; mesI++) {
+				for (dia = 0; dia < 32; dia++) {
+					if (tentativa < 1) {
+						ano = anoAtual;
+						mesI = mesAtual - 1;
+						dia = Integer.parseInt(sdf.format(lastDayOfMonth));
+						tentativa = 1;
+					}
+					if (TipoFile == "DESTDA") {
+						if (parsedText.contains(String.format(ifformatter, mes0A[mesI], ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+					} else if (TipoFile == "DSN") {
+						if (parsedText.contains(String.format(ifformatter, mes0A[mesI], ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+
+					} else if (TipoFile == "NFG") {
+						if (parsedText.contains(String.format(ifformatter, mes0A[mesI], ano, dia, mes0A[mesI], ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+
+					} else if (TipoFile == "SPED CONTRIBUICOES") {
+						if (parsedText.contains(String.format(ifformatter, mes0A[mesI], ano, dia, mes0A[mesI], ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+					} else if (TipoFile == "RDI") {
+						if (parsedText.contains(String.format(ifformatter, mes0C[mesI], ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+					} else if (TipoFile == "DEISS") {
+						if (parsedText.contains(String.format(ifformatter, ano, mes0B[mesI]))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+					} else if (TipoFile == "OPÇÃO SIMPLES") {
+						if (parsedText.contains(String.format(ifformatter, ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, ano);
+							break search;
+						}
+					}
+
+					else if (TipoFile == "DEFIS") {
+						if (parsedText.contains(String.format(ifformatter, mes0A[mesI], ano, ano))) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, ano);
+							break search;
+						}
+					} else if (TipoFile == "DMS") {
+						if (parsedText.contains("Valor do Faturamento:" + "\r\n" + mes0A[mesI] + "/" + ano)) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = (mes0A[mesI] + "." + ano);
+							break search;
+						} else if (parsedText.contains("Contribuinte:" + "\r\n" + mes0A[mesI] + "/" + ano)) {
+							anoDocumento = String.valueOf(ano);
+							Datadodocumento = String.format(dateFormatter, mes0A[mesI], ano);
+							break search;
+						}
+					}
+
+					if (tentativa == 1) {
+						ano = 1950;
+						dia = 27;
+						mesI = 0;
+						tentativa = 2;
+					}
+				}
+			}
+		}
+		return new String[] { anoDocumento, Datadodocumento };
+	}
+
+	class MyFormatter extends Formatter {
+		@Override
+		public String format(LogRecord record) {
+			StringBuilder builder = new StringBuilder();
+			builder.append(record.getLevel() + ": ");
+			builder.append(formatMessage(record));
+			builder.append(System.lineSeparator());
+			return builder.toString();
+		}
 	}
 }
