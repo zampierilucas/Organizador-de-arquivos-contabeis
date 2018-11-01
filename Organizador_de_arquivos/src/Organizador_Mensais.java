@@ -56,7 +56,7 @@ public class Organizador_Mensais {
 			DataF = "%d";
 		} else if (TipoFile == "RDI") {
 			ifformatter0 = "Periodo: " + "%s/%d";
-			DataF = "%s.%d";
+			DataF = "%s.%d"; 
 		} else if (TipoFile == "NFG") {
 			ifformatter0 = "periodo de 01/%s/%d a %d/%s/%d";
 			DataF = "%s.%d";
@@ -118,15 +118,15 @@ public class Organizador_Mensais {
 		}
 		return TipoFile;
 	}
-	
-	public static String naoSobrescrever(String Destination, File[] listOfFiles, int i, int REC){
+
+	public static String naoSobrescrever(String Destination, File[] listOfFiles, int i, int REC) {
 		// Função para não sobrescrever //
 		int fileNo = 0;
 		File DestTest = new File(Destination);
 		String DestStr = Destination;
-			while (DestTest.exists()) {
+		while (DestTest.exists()) {
 			fileNo++;
-			
+
 			if (Destination.matches("(?i).*\\.(pdf|PDF)$") && REC == 0) {
 				DestStr = Destination.replaceAll(".pdf", "(" + fileNo + ").pdf");
 			}
@@ -137,17 +137,17 @@ public class Organizador_Mensais {
 				DestStr = Destination.replaceAll(".REC", "(" + fileNo + ").REC");
 			}
 			DestTest = new File(DestStr);
-			}
-			fileNo = 0;
-			Destination = DestStr;
-			return Destination;
+		}
+		fileNo = 0;
+		Destination = DestStr;
+		return Destination;
 	}
 
-	public static void estatisticas(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)throws IOException {
-		
-		File log = new File(logPath);
+	public static void estatisticas(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)
+			throws IOException {
+
 		String Sucesso, Erros, Total, iteracaoMin, line, input = "";
-		
+
 		// ================Escrever estatisticas no log========================//
 
 		BufferedReader readLog = new BufferedReader(new FileReader(logPath));
@@ -171,9 +171,8 @@ public class Organizador_Mensais {
 			readLog.close();
 			out.write(input.getBytes());
 			out.close();
-			log.delete();
 			System.exit(0);
-			
+
 		} else if (min == 0 && seg > 0) {
 			input = input.replace("L+2", Total);// Total
 			input = input.replace("L+3", Sucesso);// Sucesso
@@ -191,7 +190,6 @@ public class Organizador_Mensais {
 		readLog.close();
 		System.out.println(input);
 	}
-
 
 	public static void main(String args[]) throws IOException {
 		int REC = 0;
@@ -228,8 +226,7 @@ public class Organizador_Mensais {
 		});
 
 		EscreveTopoLog(bw, date, dateFormat);
-		
-		
+
 		// Processa documento por documento na pasta do Organizar //
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile() && listOfFiles[i].getName().matches("(?i).*\\.(pdf|PDF|txt|TXT)$")) {
@@ -272,31 +269,33 @@ public class Organizador_Mensais {
 					// =======Descobrir nome da empresa=========//
 					EmpresaNome = EmpresaGetName(parsedText, pathtosrv, EmpresaNome);
 
-				
 					EmpresaNome = filial(parsedText, pathtosrv, EmpresaNome);
 
 					if (listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT)$")) {
-						FullPath = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"	+ listOfFiles[i].getName());
-						RECFILE =  (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"	+ listOfFiles[i].getName().replaceFirst("[.][^.]+$", ".REC"));
-						
+						FullPath = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"
+								+ listOfFiles[i].getName());
+						RECFILE = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"
+								+ listOfFiles[i].getName().replaceFirst("[.][^.]+$", ".REC"));
+
 						suposicao = new File(listOfFiles[i].getAbsolutePath().replaceFirst("[.][^.]+$", ".REC"));
 						REC = 1;
-						FullPath = naoSobrescrever(FullPath,listOfFiles,i,REC);	
+						FullPath = naoSobrescrever(FullPath, listOfFiles, i, REC);
 						REC = 2;
-						RECFILE = naoSobrescrever(RECFILE,listOfFiles,i,REC);		
-						if(suposicao.exists()){
-						verdadeiro = true;	
+						RECFILE = naoSobrescrever(RECFILE, listOfFiles, i, REC);
+						if (suposicao.exists()) {
+							verdadeiro = true;
 						}
-						}
-					
+					}
+
 					if (listOfFiles[i].getName().matches("(?i).*\\.(pdf|PDF)$")) {
 						REC = 0;
-						
-						FullPath = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"	+ TipoFile + " " + Datadodocumento + ".pdf");	 	
-						FullPath = naoSobrescrever(FullPath,listOfFiles,i,REC);	
+
+						FullPath = (pathtosrv + "" + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\"
+								+ TipoFile + " " + Datadodocumento + ".pdf");
+						FullPath = naoSobrescrever(FullPath, listOfFiles, i, REC);
 					}
-					// ===================================log==================================================================//
-					// =================Nome empresa e origem doc========================//
+					// ==========log=============//
+					// Nome empresa e origem doc //
 					bw.newLine();
 					bw.write("Empresa: " + EmpresaNome);
 					bw.newLine();
@@ -304,11 +303,10 @@ public class Organizador_Mensais {
 					bw.newLine();
 					bw.write("Destino: " + FullPath);
 					bw.newLine();
-					
 
 					// Vericiar se existe e criar diretório//
 					File PathWOFileF = new File(pathtosrv + EmpresaNome + "\\" + TipoFile + "\\" + anoDocumento + "\\");
-	
+
 					if (FullPath.contains("null")) {
 						ErroArquivo(bw, parsedText);
 					} else if (!PathWOFileF.exists()) {
@@ -316,7 +314,7 @@ public class Organizador_Mensais {
 						try {
 							PathWOFileF.mkdirs();
 							result = true;
-					
+
 						} catch (SecurityException se) {
 						}
 						if (result == true) {
@@ -324,20 +322,19 @@ public class Organizador_Mensais {
 							bw.newLine();
 						}
 					}
-					
+
 					File source = new File(listOfFiles[i].getAbsolutePath());
-				
-					if (verdadeiro == true && listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT|reg|REG)$") ){
+
+					if (verdadeiro == true && listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT|reg|REG)$")) {
 						bw.write("Destino: " + RECFILE);
 						bw.newLine();
-				}
-				
-		
-				try {	
+					}
+
+					try {
 						if (!FullPath.contains("null") && source.exists()) {
 							File destination = new File(FullPath);
-							copyFile(source, destination);				
-							source.delete();	
+							copyFile(source, destination);
+							source.delete();
 							iteracaoComSucesso++;
 						}
 						if (verdadeiro == true) {
@@ -348,12 +345,11 @@ public class Organizador_Mensais {
 							iteracaoComSucesso++;
 							iteracaoTotal++;
 						} else {
-							
-						}
-				} catch (Exception e55) {
-					e55.printStackTrace();
-				}
 
+						}
+					} catch (Exception e55) {
+						e55.printStackTrace();
+					}
 
 					bw.write(
 							"------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -377,8 +373,7 @@ public class Organizador_Mensais {
 					suposicao = null;
 					FullPath = null;
 					verdadeiro = false;
-					
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -386,14 +381,16 @@ public class Organizador_Mensais {
 			}
 		} // close for
 
-		// ================Fecha log para escrever
-		// estatisticas========================//
-		
-		
+		// Fecha log para escrever estatisticas //
+
 		bw.close();
 		fw.close();
-		if(listOfFiles.length>0) {
-		estatisticas(iteracaoComSucesso, iteracaoComErros, iteracaoTotal, logPath);
+		if (listOfFiles.length > 0) {
+			estatisticas(iteracaoComSucesso, iteracaoComErros, iteracaoTotal, logPath);
+		}
+		else {
+			File log = new File(logPath);
+			log.delete();
 		}
 		System.out.println("END OF RUN");
 	}// close main
@@ -428,8 +425,7 @@ public class Organizador_Mensais {
 		return EmpresaNome;
 	}
 
-	// ========================Move arquivo para a pasta da empresa
-	// correta(sometimes)=============================//
+	// Move arquivo para a pasta da empresa correta //
 	@SuppressWarnings("resource")
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		if (!destFile.exists()) {
@@ -445,14 +441,13 @@ public class Organizador_Mensais {
 			long count = source.size();
 			source.transferTo(position, count, destination);
 		} finally {
-		
-				source.close();
-				destination.close();
-			}
+
+			source.close();
+			destination.close();
+		}
 	}
 
-	// ==========resolve as exesões gramaticas cadastradas e encontra o periodo no
-	// documento=======================//
+	// resolve as exceções gramaticas cadastradas e encontra o periodo no documento //
 	public static String process(String parsedText, String TipoFile) {
 		try {
 			Properties prop = new Properties();
