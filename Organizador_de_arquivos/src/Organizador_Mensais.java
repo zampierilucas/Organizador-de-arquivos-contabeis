@@ -1,4 +1,3 @@
-import com.ibm.icu.util.Calendar;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,13 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.time.Year;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 import org.apache.pdfbox.cos.COSDocument;
@@ -55,7 +53,7 @@ public class Organizador_Mensais
 		} else if (TipoFile == "DEISS") {
 			ifformatter0 = "Ano e Mes de Referencia:    %d/  %s";
 			DataF = "%s.%d";
-		} else if (TipoFile == "DEFIS") {
+	} else if (TipoFile == "DEFIS") {
 			ifformatter0 = "Periodo abrangido pela Declaracao: 01/%s/%d a %d/12/%d";
 			DataF = "%d";
 		} else if (TipoFile == "RDI") {
@@ -72,7 +70,7 @@ public class Organizador_Mensais
 			ifformatter1 = "%d%s%d";
 			DataF = "%s.%d";
 		} else if (TipoFile == "DMS") {
-			ifformatter0 = "Valor do Faturamento:\r\n%s/%d";
+			ifformatter0 = "%s/%d\r\nSem Movimento de ISS";
 			ifformatter1 = "Contribuinte:\r\n%s/%d";
 			DataF = "%s.%d";
 		}
@@ -116,8 +114,9 @@ public class Organizador_Mensais
 			TipoFile = "SPED CONTRIBUICOES";
 		} else if (parsedText.contains("|0100|EVANDRO ZANOTTO|64791602072")) {
 			TipoFile = "SPED CONTRIBUICOES";
-		} else {
-			System.out.println("Tipo nÃ£o encontrado");
+		} 
+		else {
+			System.out.println("Tipo nao encontrado");
 		}
 		return TipoFile;
 	}
@@ -488,8 +487,8 @@ public class Organizador_Mensais
 		String[] mes0A = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
 		String[] mes0B = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
 		String[] mes0C = { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" };
-		String[] mes0D = { "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
-		
+		String[] mes0D = { "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
+
 		String[] retF = IdenData(TipoFile);
 		String ifformatter0 = retF[0];
 		String ifformatter1 = retF[1];
