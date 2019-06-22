@@ -39,40 +39,59 @@ public class Organizador_Mensais
 		bw.newLine();
 	}
 
-	public static String[] IdenData(String TipoFile) {
+	public static String[] get_fileData(String Document_Type) {
 		String ifformatter0 = null;
 		String ifformatter1 = null;
 		String DataF = null;
-
-		if (TipoFile == "DESTDA") {
-			ifformatter0 = "Mes Referencia %s/%d";
-			DataF = "%s.%d";
-		} else if (TipoFile == "DSN") {
-			ifformatter0 = "Principal\r\n%s/%d";
-			DataF = "%s.%d";
-		} else if (TipoFile == "DEISS") {
-			ifformatter0 = "Ano e Mes de Referencia:    %d/  %s";
-			DataF = "%s.%d";
-	} else if (TipoFile == "DEFIS") {
-			ifformatter0 = "Periodo abrangido pela Declaracao: 01/%s/%d a %d/12/%d";
-			DataF = "%d";
-		} else if (TipoFile == "RDI") {
-			ifformatter0 = "Periodo: %s/%d";
-			DataF = "%s.%d";
-		} else if (TipoFile == "NFG") {
-			ifformatter0 = "periodo de 01/%s/%d a %d/%s/%d";
-			DataF = "%s.%d";
-		} else if (TipoFile == "OPCAO SIMPLES") {
-			ifformatter0 = "Ano-calendario: %d";
-			DataF = "%d";
-		} else if (TipoFile == "SPED CONTRIBUICOES") {
-			ifformatter0 = "%d/%s/%d";
-			ifformatter1 = "%d%s%d";
-			DataF = "%s.%d";
-		} else if (TipoFile == "DMS") {
-			ifformatter0 = "%s/%d\r\nSem Movimento de ISS";
-			ifformatter1 = "Contribuinte:\r\n%s/%d";
-			DataF = "%s.%d";
+		
+		switch(Document_Type) 
+		{
+    		case "DESTDA":
+    			ifformatter0 = "Mes Referencia %s/%d";
+    			DataF = "%s.%d";
+    			break;
+    		
+    		case "DSN":
+    			ifformatter0 = "Principal\r\n%s/%d";
+    			DataF = "%s.%d";
+    			break;
+    			
+    		case "DEISS":
+    			ifformatter0 = "Ano e Mes de Referencia:    %d/  %s";
+    			DataF = "%s.%d";
+    			break;
+    			
+    		case "DEFIS":
+    			ifformatter0 = "Periodo abrangido pela Declaracao: 01/%s/%d a %d/12/%d";
+    			DataF = "%d";
+    			break;
+    			
+    		case "RDI":
+    			ifformatter0 = "Periodo: %s/%d";
+    			DataF = "%s.%d";
+    			break;
+    		case "NFG":
+    		  
+    			ifformatter0 = "periodo de 01/%s/%d a %d/%s/%d";
+    			DataF = "%s.%d";
+    			break;
+    			
+    		case "OPCAO SIMPLES":
+    			ifformatter0 = "Ano-calendario: %d";
+    			DataF = "%d";
+    			break;
+    			
+    		case "SPED CONTRIBUICOES":
+    			ifformatter0 = "%d/%s/%d";
+    			ifformatter1 = "%d%s%d";
+    			DataF = "%s.%d";
+    			break;
+    			
+    		case "DMS":
+    			ifformatter0 = "%s/%d\r\nSem Movimento de ISS";
+    			ifformatter1 = "Contribuinte:\r\n%s/%d";
+    			DataF = "%s.%d";
+    			break;
 		}
 
 		return new String[] { ifformatter0, ifformatter1, DataF };
@@ -90,35 +109,35 @@ public class Organizador_Mensais
 		bw.write("-------------------------------------------------------------------------------");
 	}
 
-	public static String tipodearquivo(String parsedText, String TipoFile)
+	public static String get_fileType(String parsedText, String Document_Type)
 	{
 		if (parsedText.contains("DeSTDA")) {
-			TipoFile = "DESTDA";
+			Document_Type = "DESTDA";
 		} else if (parsedText.contains("PGDAS-D")) {
-			TipoFile = "DSN";
+			Document_Type = "DSN";
 		} else if (parsedText.contains("DEISS")) {
-			TipoFile = "DEISS";
+			Document_Type = "DEISS";
 		} else if (parsedText.contains("DEFIS")) {
-			TipoFile = "DEFIS";
+			Document_Type = "DEFIS";
 		} else if (parsedText.contains("Valor total do ICMS a recolher")) {
-			TipoFile = "EFD ICMS IPI";
+			Document_Type = "EFD ICMS IPI";
 		} else if (parsedText.contains("Recibo de declaracao de ISS")) {
-			TipoFile = "RDI";
+			Document_Type = "RDI";
 		} else if (parsedText.contains("NFG")) {
-			TipoFile = "NFG";
+			Document_Type = "NFG";
 		} else if (parsedText.contains("DMS")) {
-			TipoFile = "DMS";
+			Document_Type = "DMS";
 		} else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas")) {
-			TipoFile = "OPCAO SIMPLES";
+			Document_Type = "OPCAO SIMPLES";
 		} else if (parsedText.contains("RECIBO DE ENTREGA DE ESCRITURACAO FISCAL DIGITAL - CONTRIBUICOES")) {
-			TipoFile = "SPED CONTRIBUICOES";
+			Document_Type = "SPED CONTRIBUICOES";
 		} else if (parsedText.contains("|0100|EVANDRO ZANOTTO|64791602072")) {
-			TipoFile = "SPED CONTRIBUICOES";
+			Document_Type = "SPED CONTRIBUICOES";
 		} 
 		else {
 			System.out.println("Tipo nao encontrado");
 		}
-		return TipoFile;
+		return Document_Type;
 	}
 
 	public static String naoSobrescrever(String Destination, File[] listOfFiles, int i, int REC)
@@ -145,18 +164,15 @@ public class Organizador_Mensais
 		return Destination;
 	}
 
-	public static void estatisticas(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)
+	public static void write_statystics(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)
 			throws IOException
 	{
 		String input = "";
 
-
-
 		BufferedReader readLog = new BufferedReader(new FileReader(logPath));
 		String line;
-		while ((line = readLog.readLine()) != null) { 
+		while ((line = readLog.readLine()) != null)  
 			input = input + line + System.lineSeparator();
-		}
 
 		int min = iteracaoTotal * 20 / 60;
 		int seg = iteracaoTotal * 20 - min * 60;
@@ -211,9 +227,14 @@ public class Organizador_Mensais
 	public static void main(String[] args) throws IOException { int REC = 0;
 	String FullPath = null;
 	String RECFILE = null;
+	
+	// Windows Implemetation
 	String pathtoread = "\\\\10.1.20.30\\Organizador\\";
 	String pathtosrv = "\\\\10.1.20.13\\setores\\GERAL\\Documentos empresariais\\Documentos\\";
+	
+	// linux implementation
 	//String pathtosrv = "smb://10.1.20.13/setores/GERAL/Documentos empresariais/Documentos/";
+	
 	String logPath = pathtoread + "log\\" + "log " + data_agora() + ".txt";
 	String EmpresaNome = null;
 	String Datadodocumento = null;
@@ -265,7 +286,7 @@ public class Organizador_Mensais
 					parsedText = parsedText.replaceAll("&", "E");
 				}
 
-				TipoFile = tipodearquivo(parsedText, TipoFile);
+				TipoFile = get_fileType(parsedText, TipoFile);
 				pdDoc.close();
 
 				parsedText = excecoes(parsedText, TipoFile);
@@ -391,7 +412,7 @@ public class Organizador_Mensais
 	bw.close();
 	fw.close();
 	if (listOfFiles.length > 0) {
-		estatisticas(iteracaoComSucesso, iteracaoComErros, iteracaoTotal, logPath);
+		write_statystics(iteracaoComSucesso, iteracaoComErros, iteracaoTotal, logPath);
 	}
 	else {
 		File log = new File(logPath);
@@ -489,7 +510,7 @@ public class Organizador_Mensais
 		String[] mes0C = { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" };
 		String[] mes0D = { "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
 
-		String[] retF = IdenData(TipoFile);
+		String[] retF = get_fileData(TipoFile);
 		String ifformatter0 = retF[0];
 		String ifformatter1 = retF[1];
 		String dateFormatter = retF[2];
@@ -501,72 +522,84 @@ public class Organizador_Mensais
 					if (tentativa < 1) {
 						ano = Year.now().getValue();
 						mesI = calendar.get(2);
-						dia = Calendar.getInstance().getActualMaximum(5);
+						dia =  Calendar.getInstance().getActualMaximum(5);
 						tentativa = 1;
 					}
 					
+					switch(TipoFile)
+					{
+    					case "DESTDA":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) {
+    						    anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    					
+    					case "DSN":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) { 
+    						    anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    					
+    					case "NFG":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano), Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) }))) {
+    						    anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    					
+    					case "SPED CONTRIBUICOES":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) })) ||
+    						    parsedText.contains(String.format(ifformatter1, new Object[] { Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) }))) 
+    						{
+  						        anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    					
+    					case "RDI":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0D[mesI], Integer.valueOf(ano) }))) {
+  						        anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    					
+    					case "DEISS":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(ano), mes0B[mesI] }))) {
+    						    anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    						
+    					case "DMS":
+    						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) })) ||  
+    						    parsedText.contains(String.format(ifformatter1, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) 
+    						{
+    	                        anoDocumento = SET_ANO_DOCUMENTO(ano);
+    	                        Datadodocumento = SET_DATA_DOCUMENTO_MMAAAA(dateFormatter,mes0A,mesI,ano);
+    						}
+    						break;
+    						
+                        case "OPCAO SIMPLES":
+                            if (parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(ano) }))) {
+                                anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_AAAA(dateFormatter,ano);
+                            }
+                            break;
+                            
+                        case "DEFIS":
+                            if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano), Integer.valueOf(dia), Integer.valueOf(ano) }))) {
+                                anoDocumento = SET_ANO_DOCUMENTO(ano);
+                                Datadodocumento = SET_DATA_DOCUMENTO_AAAA(dateFormatter,ano);
+                            }
+                            break;
+      					
+    					default: 
+    						System.out.println("Identificador de tipo de arquivo nao encontrado.");
+    						break;
+					}
 					
-					if (TipoFile == "DESTDA") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "DSN") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) { 
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "NFG") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano), Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "SPED CONTRIBUICOES") {
-						if (!parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) }))) {
-							if (!parsedText.contains(String.format(ifformatter1, new Object[] { Integer.valueOf(dia), mes0A[mesI], Integer.valueOf(ano) }))) {}
-						} else {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "RDI") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0D[mesI], Integer.valueOf(ano) }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "DEISS") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(ano), mes0B[mesI] }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "OPCAO SIMPLES") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { Integer.valueOf(ano) }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "DEFIS") {
-						if (parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano), Integer.valueOf(dia), Integer.valueOf(ano) }))) {
-							anoDocumento = String.valueOf(ano);
-							Datadodocumento = String.format(dateFormatter, new Object[] { Integer.valueOf(ano) });
-							break;
-						}
-					} else if (TipoFile == "DMS") {
-						if (!parsedText.contains(String.format(ifformatter0, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) { if (!parsedText.contains(String.format(ifformatter1, new Object[] { mes0A[mesI], Integer.valueOf(ano) }))) {}
-						} else { anoDocumento = String.valueOf(ano);
-						Datadodocumento = String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
-						break;
-						}
-					}
-					else {
-						System.out.println("Identificador de tipo de arquivo nao encontrado.");
-					}
-
 					if (tentativa == 1) {
 						ano = 1950;
 						dia = 27;
@@ -578,5 +611,18 @@ public class Organizador_Mensais
 		}
 		return new String[] { anoDocumento, Datadodocumento };
 	}
+
+  private static String SET_DATA_DOCUMENTO_AAAA(String dateFormatter, int ano) {
+    return String.format(dateFormatter, new Object[] { Integer.valueOf(ano) });
+  }
+
+  private static String SET_ANO_DOCUMENTO(int ano) {
+    return String.valueOf(ano);
+  }
+
+  private static String SET_DATA_DOCUMENTO_MMAAAA(String dateFormatter, String[] mes0A, int mesI,
+      int ano) {
+    return String.format(dateFormatter, new Object[] { mes0A[mesI], Integer.valueOf(ano) });
+  }
 	
 }
