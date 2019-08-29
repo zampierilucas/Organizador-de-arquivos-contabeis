@@ -322,13 +322,14 @@ public class Organizador_Mensais
 		String dateFormatter;
 
 		for (int ano = 1950; ano < 2100; ano++) {
-			for (int mesI = 0; mesI < 12; mesI++) {
+			for (int mesI0 = 0; mesI0 < 12; mesI0++) {
+			  for(int mesI1 = 0; mesI1 < 12; mesI1++) {
 				for (int dia = 0; dia < 32; dia++)
 				{
 				    // Teste o resultado mais possivel, no caso mes anterior.
 					if (tentativa < 1) {
 						ano = Year.now().getValue();
-						mesI = calendar.get(2);
+						mesI0 = calendar.get(2);
 						dia =  Calendar.getInstance().getActualMaximum(5);
 						tentativa = 1;
 					}
@@ -341,11 +342,11 @@ public class Organizador_Mensais
     		                Formatador_1 = "Mes Referencia %s/%d";
     		                dateFormatter = "%s.%d";
     		                
-                            searchOnDoc = createString(Formatador_1,mes0A[mesI], toInt(ano));     
+                            searchOnDoc = createString(Formatador_1,mes0A[mesI0], toInt(ano));     
                             
                             if (parsedText.contains(searchOnDoc)){
     						    anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     					
@@ -353,11 +354,11 @@ public class Organizador_Mensais
     		                Formatador_1 = "Principal\r\n%s/%d";
     		                dateFormatter = "%s.%d";
                             
-                            searchOnDoc = createString(Formatador_1,mes0A[mesI], toInt(ano));     
+                            searchOnDoc = createString(Formatador_1, mes0A[mesI0], toInt(ano));     
                             
                             if (parsedText.contains(searchOnDoc)){
     						    anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     					
@@ -365,11 +366,11 @@ public class Organizador_Mensais
     		                Formatador_1 = "periodo de 01/%s/%d a %d/%s/%d";
     		                dateFormatter = "%s.%d";
     						
-                            searchOnDoc = createString(Formatador_1,mes0A[mesI], toInt(ano), toInt(dia), mes0A[mesI], toInt(ano));     
+                            searchOnDoc = createString(Formatador_1, mes0A[mesI0], toInt(ano), toInt(dia), mes0A[mesI0], toInt(ano));     
                             
                             if (parsedText.contains(searchOnDoc)){
     						    anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     					
@@ -379,14 +380,14 @@ public class Organizador_Mensais
     		                dateFormatter = "%s.%d";
     		                
     		                //Teste Formatador 1
-                            if (parsedText.contains(createString(Formatador_1,toInt(dia), mes0A[mesI], toInt(ano)))){
+                            if (parsedText.contains(createString(Formatador_1,toInt(dia), mes0A[mesI0], toInt(ano)))){
                               anoDocumento = set_AnoDocumento(ano);
-                              Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                              Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
                             }
                             //Teste Formatado 2 
-                            else if(parsedText.contains(createString(Formatador_2, toInt(dia), mes0A[mesI], toInt(ano)))){
+                            else if(parsedText.contains(createString(Formatador_2, toInt(dia), mes0A[mesI0], toInt(ano)))){
   						        anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     					
@@ -394,11 +395,11 @@ public class Organizador_Mensais
     		                Formatador_1 = "Periodo: %s/%d";
     		                dateFormatter = "%s.%d";
     					  
-                            searchOnDoc = createString(Formatador_1, mes0D[mesI], toInt(ano));     
+                            searchOnDoc = createString(Formatador_1, mes0D[mesI0], toInt(ano));     
                             
                             if (parsedText.contains(searchOnDoc)){
   						        anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     					
@@ -406,11 +407,11 @@ public class Organizador_Mensais
     		                Formatador_1 = "Ano e Mes de Referencia:    %d/  %s";
     		                dateFormatter = "%s.%d";
 
-                            searchOnDoc = createString(Formatador_1,toInt(ano), mes0B[mesI]);     
+                            searchOnDoc = createString(Formatador_1,toInt(ano), mes0B[mesI0]);     
                                                         
                             if (parsedText.contains(searchOnDoc)){
     						    anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
     						break;
     						
@@ -420,14 +421,14 @@ public class Organizador_Mensais
     		                dateFormatter = "%s.%d";
     						
                             // teste Fortamatador 1
-                            if (parsedText.contains(createString(Formatador_1, mes0A[mesI], toInt(ano)))){
+                            if (parsedText.contains(createString(Formatador_1, mes0A[mesI0], toInt(ano)))){
     	                        anoDocumento = set_AnoDocumento(ano);
-    	                        Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+    	                        Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
                             // Teste Formatador 2
-                            else if (parsedText.contains(createString(Formatador_2, mes0A[mesI], toInt(ano)))){
+                            else if (parsedText.contains(createString(Formatador_2, mes0A[mesI0], toInt(ano)))){
                                 anoDocumento = set_AnoDocumento(ano);
-                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI,ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
                            
                             }
     						break;
@@ -446,10 +447,11 @@ public class Organizador_Mensais
                             
                         case "DEFIS":
                             //Periodo abrangido pela Declaracao: 01/01/2019 a 26/06/2019
-                            Formatador_1 = "Periodo abrangido pela Declaracao: 01/01/%d a %d/%s/%d";
+                            //Periodo abrangido pela Declaracao: 01/04/2018 a 31/12/2018
+                            Formatador_1 = "Periodo abrangido pela Declaracao: 01/%s/%d a %d/%s/%d";
                             dateFormatter = "%d";
                             
-                            searchOnDoc = createString(Formatador_1, toInt(ano), toInt(dia),mes0A[mesI], toInt(ano));
+                            searchOnDoc = createString(Formatador_1, mes0A[mesI1], toInt(ano), toInt(dia), mes0A[mesI0], toInt(ano));
 
                             if (parsedText.contains(searchOnDoc)){
                                 anoDocumento = set_AnoDocumento(ano);
@@ -463,7 +465,7 @@ public class Organizador_Mensais
                         //Ano e Mes de Referencia:    2019/  5
                         Formatador_1 = "Ano e Mes de Referencia:    %d/  %d";
                         dateFormatter = "%d";
-                        searchOnDoc = createString(Formatador_1, toInt(ano) ,toInt(mesI));
+                        searchOnDoc = createString(Formatador_1, toInt(ano) ,toInt(mesI0));
                         
                         if (parsedText.contains(searchOnDoc)){
                             anoDocumento = set_AnoDocumento(ano);
@@ -479,23 +481,26 @@ public class Organizador_Mensais
 					if (tentativa == 1) {
 						ano = 1950;
 						dia = 27;
-						mesI = 0;
+						mesI0 = 0;
 						tentativa = 2;
 					}
 				}
+			  }
 			}
 		}
 		return new String[] { anoDocumento, Datadodocumento };
 	}
 	
-	   // Cria String para ser pesquisada no documento
-	   static String createString(String formatador,Object... obj){
-	     return String.format(formatador,obj);
-	   }
-	   
-	   static int toInt(int integer_parameter){
-	     return Integer.valueOf(integer_parameter);
-	   }
+    // Cria String para ser pesquisada no documento
+    static String createString(String formatador, Object... obj)
+    {
+      return (String.format(formatador, obj));
+    }
+    
+    static int toInt(int integer_parameter)
+    {
+      return Integer.valueOf(integer_parameter);
+    }
 	
 	   public static void EscreveTopoLog(BufferedWriter bw, String data_atual) throws IOException
 	    {
