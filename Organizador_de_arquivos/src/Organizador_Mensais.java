@@ -25,7 +25,6 @@ public class Organizador_Mensais
 	public Organizador_Mensais() {}
 
 
-
 	public static void main(String[] args) throws IOException { int REC = 0;
 	String FullPath = null;
 	String RECFILE = null;
@@ -49,11 +48,10 @@ public class Organizador_Mensais
 	String parsedText = "";    
 	fw = new FileWriter(logPath);
 	bw = new BufferedWriter(fw);
-	int iteracaoComSucesso = 0;int iteracaoComErros = 0;int iteracaoTotal = 0;int counter = 0;
+	int iteracaoComSucesso = 0, iteracaoComErros = 0, iteracaoTotal = 0, counter = 0;
 	String anoDocumento = null;    
 	File suposicao = null;
-	boolean verdadeiro = false;
-
+	boolean SPED_hasExtraFIles = false;
 
 	File directory = new File(pathtoread);
 	File[] listOfFiles = directory.listFiles();
@@ -113,7 +111,7 @@ public class Organizador_Mensais
 				REC = 2;
 				RECFILE = naoSobrescrever(RECFILE, listOfFiles, i, REC);
 				if (suposicao.exists()) {
-					verdadeiro = true;
+					SPED_hasExtraFIles = true;
 				}
 			}
 
@@ -159,20 +157,22 @@ public class Organizador_Mensais
 
 			File source = new File(listOfFiles[i].getAbsolutePath());
 
-			if ((verdadeiro) && (listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT|reg|REG)$"))) {
+			if ((SPED_hasExtraFIles) && (listOfFiles[i].getName().matches("(?i).*\\.(txt|TXT|reg|REG)$"))) {
 				bw.write("Destino: " + RECFILE);
 				bw.newLine();
 			}
 			try
 			{
+			    // If all identification is correct, move file renaming and delet from source
 				if ((!FullPath.contains("null")) && (source.exists())) {
 					File destination = new File(FullPath);
 					copyFile(source, destination);
-					System.out.println("this is source" + source);
+					System.out.println("this is source " + source);
 					source.delete();
 					iteracaoComSucesso++;
 				}
-				if (verdadeiro) {
+				// If is SPED, try to move extra files with it
+				if (SPED_hasExtraFIles) {
 					File destinationREC = new File(RECFILE);
 					copyFile(suposicao, destinationREC);
 					suposicao.delete();
@@ -195,7 +195,7 @@ public class Organizador_Mensais
 			source = null;
 			suposicao = null;
 			FullPath = null;
-			verdadeiro = false;
+			SPED_hasExtraFIles = false;
 			pdDoc.close();
 			cosDoc.close();
 			}
@@ -272,6 +272,7 @@ public class Organizador_Mensais
 		}
 	}
 
+	// Treat naming exceptions, and simply namimg
 	public static String excecoes(String parsedText, String TipoFile)
 	{
 		try {
@@ -285,7 +286,7 @@ public class Organizador_Mensais
 	            
 			for (int exceptionIndex = 1; exceptionIndex <= prop.size() / 2; exceptionIndex++) {
     			replaceFrom = prop.getProperty(Integer.toString(exceptionIndex) + "A");
-    			replaceTo =   prop.getProperty(Integer.toString(exceptionIndex) + "B");
+    			replaceTo   = prop.getProperty(Integer.toString(exceptionIndex) + "B");
     			
     	        parsedText = parsedText.replaceAll(replaceFrom,replaceTo);
 	        
@@ -352,14 +353,17 @@ public class Organizador_Mensais
     					
     					case "DSN":
     		                Formatador_1 = "Principal\r\n%s/%d";
+    		                Formatador_2 = "Exigivel\r\n%s/%d";
     		                dateFormatter = "%s.%d";
-                            
-                            searchOnDoc = createString(Formatador_1, mes0A[mesI0], toInt(ano));     
-                            
-                            if (parsedText.contains(searchOnDoc)){
+                                                        
+                            if (parsedText.contains(createString(Formatador_1, mes0A[mesI0], toInt(ano)))){
     						    anoDocumento = set_AnoDocumento(ano);
                                 Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
+                            else if(parsedText.contains(createString(Formatador_2, mes0A[mesI0], toInt(ano)))){
+                                anoDocumento = set_AnoDocumento(ano);
+                                Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
+                            }
     						break;
     					
     					case "NFG":
@@ -372,6 +376,7 @@ public class Organizador_Mensais
     						    anoDocumento = set_AnoDocumento(ano);
                                 Datadodocumento = set_DataDocumentoAnoMes(dateFormatter,mes0A,mesI0,ano);
     						}
+                            
     						break;
     					
     					case "SPED CONTRIBUICOES":
