@@ -85,7 +85,7 @@ public class Organizador_Mensais
 			Datadodocumento = ret[1];
 
 			// Get company name
-			EmpresaNome = data.CompanyName(parsedText, pathtosrv);
+			EmpresaNome = data.CompanyName(parsedText,TipoFile, pathtosrv);
 			
 			// Verify for 'filial'
 			EmpresaNome = filial(parsedText, pathtosrv, EmpresaNome);

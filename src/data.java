@@ -1,24 +1,22 @@
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Properties;
 
 public class data {
 	// Search for company name on server folders
-	public static String CompanyName(String ArquivoProcessado, String pathtosrv) {
+	public static String CompanyName(String ArquivoProcessado, String fileType, String pathtosrv) {
 
 		File pasta = new File(pathtosrv);
 		File[] pastas_SRV = pasta.listFiles();
 		String CompanyName = null;
 		String serverCompanyName = null;
-
+		
 		for (int index = 0; index < pastas_SRV.length; index++) {
 
-			serverCompanyName = pastas_SRV[index].getName();
-//			serverCompanyName = NamingNormalization(pastas_SRV[index].getName(),"COMPANY_COMMON");
-
-			if (ArquivoProcessado.contains(serverCompanyName)) {
+//			serverCompanyName = pastas_SRV[index].getName();
+			serverCompanyName = NamingNormalization(pastas_SRV[index].getName(),"COMPANY_COMMON");
+			
+			if (ArquivoProcessado.contains(serverCompanyName) || serverCompanyName.contains(ArquivoProcessado) ) {
 				CompanyName = pastas_SRV[index].getName();
 			}
 		}
@@ -26,7 +24,7 @@ public class data {
 		return CompanyName;
 	}
 
-	// Treat naming exceptions, and simplify comp[any naming
+	// Treat naming exceptions, and simplify company naming
 	public static String NamingNormalization(String parsedText, String TipoFile) {
 		  	
 		String replaceFrom = null;
@@ -50,7 +48,7 @@ public class data {
 		}
 			
 		// Return normalized text
-		return parsedText;
+		return new String(parsedText);
 	}
 
 	public static String fileType(String parsedText) {
