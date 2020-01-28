@@ -1,52 +1,54 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class data {
 	// Search for company name on server folders
-	public static String CompanyName(String ArquivoProcessado, String fileType, String pathtosrv) {
+	public static String CompanyName(String ArquivoProcessado, String fileType, String pathtosrv) throws IOException {
+
+		String CompanyName = null;
+		String serverCompanyName = null;
 
 		File pasta = new File(pathtosrv);
 		File[] pastas_SRV = pasta.listFiles();
-		String CompanyName = null;
-		String serverCompanyName = null;
-		
+
+		// Search in all company folders
 		for (int index = 0; index < pastas_SRV.length; index++) {
 
-//			serverCompanyName = pastas_SRV[index].getName();
-			serverCompanyName = NamingNormalization(pastas_SRV[index].getName(),"COMPANY_COMMON");
+			// Apply common normalization
+			serverCompanyName = NamingNormalization(pastas_SRV[index].getName(), "COMPANY_COMMON");
 			
-			if (ArquivoProcessado.contains(serverCompanyName) || serverCompanyName.contains(ArquivoProcessado) ) {
+			// Server name matches to document
+			if (ArquivoProcessado.contains(serverCompanyName) || serverCompanyName.contains(ArquivoProcessado)) {
 				CompanyName = pastas_SRV[index].getName();
 			}
 		}
-
 		return CompanyName;
 	}
 
 	// Treat naming exceptions, and simplify company naming
-	public static String NamingNormalization(String parsedText, String TipoFile) {
-		  	
+	public static String NamingNormalization(String parsedText, String tipeOfFile) throws IOException {
+
 		String replaceFrom = null;
 		String replaceTo = null;
-		Properties prop = new Properties();       
+		Properties prop = new Properties();
 
 		// Select file based on type
-		try {
-			FileInputStream exeptions = new FileInputStream("\\\\10.1.20.30\\excecoesOrganizador\\" + TipoFile + ".properties");
-	
-			// Load file properties
-			prop.load(exeptions);
-		} catch (Exception e){}
-		
+		FileInputStream exeptions = new FileInputStream(
+				"\\\\10.1.20.30\\excecoesOrganizador\\" + tipeOfFile + ".properties");
+
+		// Load file properties
+		prop.load(exeptions);
+
 		for (int exceptionIndex = 1; exceptionIndex <= prop.size() / 2; exceptionIndex++) {
-			// Replace properti A to B
+
 			replaceFrom = prop.getProperty(Integer.toString(exceptionIndex) + "A");
-			replaceTo   = prop.getProperty(Integer.toString(exceptionIndex) + "B");
-			
-	        parsedText = parsedText.replaceAll(replaceFrom,replaceTo);
+			replaceTo = prop.getProperty(Integer.toString(exceptionIndex) + "B");
+
+			parsedText = parsedText.replaceAll(replaceFrom, replaceTo);
 		}
-			
+
 		// Return normalized text
 		return new String(parsedText);
 	}
@@ -105,5 +107,16 @@ public class data {
 			Document_Type = "nulo";
 		}
 		return Document_Type;
+	}
+
+	// Normalize and clean up pdf
+	static String normalize(String parsedText) {
+
+		parsedText = java.text.Normalizer.normalize(parsedText, java.text.Normalizer.Form.NFD);
+		parsedText = parsedText.replaceAll("[^\\p{ASCII}]", "");
+		parsedText = parsedText.replaceAll("&", "E");
+		parsedText = parsedText.replaceAll("'", "");
+
+		return parsedText;
 	}
 }
