@@ -34,10 +34,18 @@ public class log {
 		bw.newLine();
 	}
 
-	public static void ErrorFound(BufferedWriter bw, String parsedText) throws IOException {
+	public static void ErrorFound(BufferedWriter bw, String DOCPath,  String parsedText, String ErrorMsg) throws IOException {
 
 		bw.newLine();
-		bw.write("Erro no doc:");
+		bw.write("Erro encontrado no arquivo: " + DOCPath);
+		bw.newLine();
+		
+		if (ErrorMsg != null) {
+			bw.write("Descrição do erro: " + ErrorMsg);
+			bw.newLine();
+		}
+
+		bw.write("Conteudo do arquivo:");
 		bw.newLine();
 		bw.newLine();
 		bw.write(parsedText);
@@ -47,24 +55,25 @@ public class log {
 		bw.write("-------------------------------------------------------------------------------");
 	}
 
-	public static void statystics(int iteracaoComSucesso, int iteracaoComErros, int iteracaoTotal, String logPath)
-			throws IOException {
+	public static void statystics(int Success, int Errors, String logPath) throws IOException {
 		String input = "";
-
+		int iteracaoTotal = Success + Errors;
+		
 		BufferedReader readLog = new BufferedReader(new FileReader(logPath));
-		String line;
+		String line = null;
+		
 		while ((line = readLog.readLine()) != null)
 			input = input + line + System.lineSeparator();
-
+		
 		int min = iteracaoTotal * 20 / 60;
 		int seg = iteracaoTotal * 20 - min * 60;
-		String iteracaoMin = min + ":" + seg;
+		String TimeSaved = min + ":" + seg;
 
-		iteracaoComErros = iteracaoTotal - iteracaoComSucesso;
+		Errors = iteracaoTotal - Success;
 
-		String Sucesso = Integer.toString(iteracaoComSucesso);
-		String Erros = Integer.toString(iteracaoComErros);
-		String Total = Integer.toString(iteracaoTotal);
+		String LogSuccess = Integer.toString(Success);
+		String LogError = Integer.toString(Errors);
+		String LogTotal = Integer.toString(iteracaoTotal);
 
 		if (iteracaoTotal == 0) {
 			FileOutputStream out = new FileOutputStream(logPath);
@@ -73,15 +82,15 @@ public class log {
 			out.close();
 			System.exit(0);
 		} else if ((min == 0) && (seg > 0)) {
-			input = input.replace("L+2", Total);
-			input = input.replace("L+3", Sucesso);
-			input = input.replace("L+4", Erros);
-			input = input.replace("L+5 minutos", iteracaoMin + " segundos");
+			input = input.replace("L+2", LogTotal);
+			input = input.replace("L+3", LogSuccess);
+			input = input.replace("L+4", LogError);
+			input = input.replace("L+5 minutos", TimeSaved + " segundos");
 		} else {
-			input = input.replace("L+2", Total);
-			input = input.replace("L+3", Sucesso);
-			input = input.replace("L+4", Erros);
-			input = input.replace("L+5", iteracaoMin);
+			input = input.replace("L+2", LogTotal);
+			input = input.replace("L+3", LogSuccess);
+			input = input.replace("L+4", LogError);
+			input = input.replace("L+5", TimeSaved);
 		}
 		FileOutputStream out = new FileOutputStream(logPath);
 		out.write(input.getBytes());
@@ -89,5 +98,6 @@ public class log {
 		readLog.close();
 		System.out.println(input);
 	}
+
 
 }
