@@ -71,12 +71,11 @@ public class Organizador_Mensais {
 						ParsedText = data.normalize(ParsedText);
 
 					}
-
 					
 					// Get tipe of of Document
 					TipeOfFile = data.fileType(ParsedText);
 					if (TipeOfFile == null) {
-						log.ErrorFound(logWrite, file_name, ParsedText, "Tipo de arquivo não encontrado");
+						log.ErrorFound(logWrite, file_name, ParsedText, "Tipo de arquivo nï¿½o encontrado");
 						LOG_Error++;
 						continue;
 					}
@@ -84,7 +83,7 @@ public class Organizador_Mensais {
 					// Get Day, Mount and Year of Document
 					date CurrentDocDate = data.DocumentPeriod(ParsedText, TipeOfFile);
 					if (CurrentDocDate.year() == null) {
-						log.ErrorFound(logWrite, file_name, ParsedText, "Data do ducumento não encontrada");
+						log.ErrorFound(logWrite, file_name, ParsedText, "Data do ducumento nï¿½o encontrada");
 						LOG_Error++;
 						continue;
 					}
@@ -92,7 +91,7 @@ public class Organizador_Mensais {
 					// Get company CNPJ from Document
 					CompanyCNPJ = data.CompanyCNPJ(ParsedText);	
 					if (CompanyCNPJ == null) {
-						log.ErrorFound(logWrite, file_name, ParsedText, "CNPJ não encontrado no arquivo");
+						log.ErrorFound(logWrite, file_name, ParsedText, "CNPJ nï¿½o encontrado no arquivo");
 						LOG_Error++;
 						continue;
 					}
@@ -100,7 +99,7 @@ public class Organizador_Mensais {
 					// Get Path based on file CNPJ
 					SRVCompanyPath = data.ConvertCNPJtoPath(CompanyCNPJ, PathToSrv);
 					if (SRVCompanyPath == null) {
-						log.ErrorFound(logWrite, file_name, ParsedText, "Caminho não encontrado no servidor");
+						log.ErrorFound(logWrite, file_name, ParsedText, "Caminho nï¿½o encontrado no servidor");
 						LOG_Error++;
 						continue;
 					}
@@ -155,7 +154,7 @@ public class Organizador_Mensais {
 
 						// Log access error
 						catch (SecurityException SE) {
-							log.ErrorFound(logWrite, file_name, ParsedText, "Não foi possivel acessar o diretório");
+							log.ErrorFound(logWrite, file_name, ParsedText, "Nï¿½o foi possivel acessar o diretï¿½rio");
 							LOG_Error++;
 							continue;
 						}
