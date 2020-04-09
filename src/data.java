@@ -15,7 +15,8 @@ public class data {
 		public static String CompanyCNPJ(String CurrentFile) {
 			
 			String FoundCNPJ = null;
-			Pattern CNPJ_Rgx = Pattern.compile("([0-9]{2}\\.[0-9]{3}\\.[0-9]{3}\\/[0-9]{4}\\-[0-9]{2})|([0-9]{14}[^0-9])|([0-9]{13}[^0-9])|([0-9]{12}[^0-9])");
+			
+			Pattern CNPJ_Rgx = Pattern.compile("([0-9]{2}\\.[0-9]{3}\\.[0-9]{3}\\/[0-9]{4}\\-[0-9]{2})|([^0-9][0-9]{14}[^0-9])|([^0-9][0-9]{13}[^0-9])|([^0-9][0-9]{12}[^0-9])");
 			 
 			Matcher CNPJ = CNPJ_Rgx.matcher(CurrentFile);
 			
