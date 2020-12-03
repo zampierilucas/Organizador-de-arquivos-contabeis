@@ -50,8 +50,8 @@ public class data {
 		else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas"))
 			Document_Type = "OPCAO SIMPLES";
 
-		// ISS - Antonio Prado
-		else if (parsedText.contains("DEISS"))
+		// ISS - Antonio Prado E Vacaria
+		else if (parsedText.contains("DEISS") || parsedText.contains("Prefeitura Municipal de Vacaria"))
 			Document_Type = "DEISS";
 
 		// ISS - Ipê
