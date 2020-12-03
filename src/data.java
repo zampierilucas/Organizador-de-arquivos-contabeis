@@ -15,17 +15,20 @@ public class data {
 		public static String CompanyCNPJ(String CurrentFile) {
 			
 			String FoundCNPJ = null;
+			int i = 0;
 			
 			Pattern CNPJ_Rgx = Pattern.compile("([0-9]{2}\\.[0-9]{3}\\.[0-9]{3}\\/[0-9]{4}\\-[0-9]{2})|([^0-9][0-9]{14}[^0-9])|([^0-9][0-9]{13}[^0-9])|([^0-9][0-9]{12}[^0-9])");
 			 
 			Matcher CNPJ = CNPJ_Rgx.matcher(CurrentFile);
 			
-			if (CNPJ.find())
+			while(CNPJ.find() && i<10)
 			{
-			    FoundCNPJ = CNPJ.group();
+			    FoundCNPJ = CNPJ.group().replaceAll("[^0-9]","");
 			    
-				// Return only numbers
-			    return FoundCNPJ.replaceAll("[^0-9]","");
+			    if (Long.parseLong(FoundCNPJ) != 0)
+				    return FoundCNPJ;
+			    else
+			    	i++;
 			}
 
 			return null;
@@ -43,7 +46,7 @@ public class data {
 		else if (parsedText.contains("PGDAS-D"))
 			Document_Type = "DSN";
 
-		// Simples naciona - opcao anual
+		// Simples naciona - opcão anual
 		else if (parsedText.contains("Opcao pelo Regime de Apuracao de Receitas"))
 			Document_Type = "OPCAO SIMPLES";
 
